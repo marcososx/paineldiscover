@@ -96,10 +96,21 @@ main{ flex:1; position:relative; min-height:0; }
   color:var(--cyan); text-shadow:0 0 14px color-mix(in srgb, var(--cyan) 70%, transparent),
     0 0 30px color-mix(in srgb, var(--cyan) 35%, transparent);
 }
-.osint .osint-head .live{ font:700 10px var(--mono); letter-spacing:1px; color:var(--alert);
-  display:flex; align-items:center; gap:6px; }
-.osint .osint-head .live::before{ content:''; width:7px; height:7px; border-radius:50%;
-  background:var(--alert); animation:blink 1.3s infinite; }
+.osint .osint-head .live{
+  font:800 11px var(--mono); letter-spacing:1.5px; text-transform:uppercase;
+  color:#ff2d55; display:flex; align-items:center; gap:7px;
+  text-shadow:0 0 12px rgba(255,45,85,.75), 0 0 26px rgba(255,45,85,.35);
+}
+.osint .osint-head .live::before{
+  content:''; width:9px; height:9px; border-radius:50%;
+  background:#ff2d55; box-shadow:0 0 8px rgba(255,45,85,.9);
+  animation:livePulse 1.1s ease-out infinite;
+}
+@keyframes livePulse{
+  0%{ box-shadow:0 0 0 0 rgba(255,45,85,.85); transform:scale(1); }
+  70%{ box-shadow:0 0 0 11px rgba(255,45,85,0); transform:scale(1.15); }
+  100%{ box-shadow:0 0 0 0 rgba(255,45,85,0); transform:scale(1); }
+}
 .osint .osint-head .count{ font:700 10px var(--mono); color:var(--muted); }
 .osint-toggle{
   margin-left:auto; flex:none; background:none; border:1px solid var(--border2);
