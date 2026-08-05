@@ -19,7 +19,9 @@
 
   const $ = id => document.getElementById(id);
   const track = $('ticker-track');        // notícias
-  const osintTrack = $('osint-track');    // boletins (feed horizontal)
+  const osintTrack = $('osint-track');    // boletins (feed expandido)
+  const miniTrack = $('osint-mini-track');// boletins (feed recolhido)
+  const osintBox = $('osint');
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   const timeHm = ts => {
@@ -67,11 +69,12 @@
     }
   }
 
-  /* ── OSINT Feed: boletins (horizontal, sobreposto ao mapa) ─ */
+  /* ── OSINT Feed: boletins (caixa recolhível) ───────────── */
   function renderOsint(posts){
     $('osint-count').textContent = posts.length ? posts.length + ' boletins' : '';
     if (!posts.length){
       osintTrack.innerHTML = '<div class="bcard"><h3>Aguardando publicação</h3><p>O QG vai publicar aqui em breve.</p></div>';
+      miniTrack.innerHTML = '<span class="mini-item">Sem boletins ainda</span>';
       return;
     }
     const card = p => '<article class="bcard">'
@@ -81,8 +84,20 @@
       + (p.url ? '<a class="link" href="' + esc(p.url) + '" target="_blank" rel="noopener">'
           + esc(p.labelLink || 'Ver mais') + ' &nearr;</a>' : '')
       + '</article>';
+    const mini = p => '<span class="mini-item">'
+      + '<span class="mi-time">' + timeHm(p.ts) + '</span>' + esc(p.titulo) + '</span>';
     osintTrack.innerHTML = posts.map(card).join('') + posts.map(card).join('');
+    miniTrack.innerHTML = posts.map(mini).join('') + posts.map(mini).join('');
   }
+
+  /* ── Recolher / expandir o OSINT ───────────────────────── */
+  function setOsintCollapsed(c){
+    osintBox.classList.toggle('collapsed', c);
+    $('osint-toggle').textContent = c ? '▴' : '▾';
+  }
+  const osintToggle = () => setOsintCollapsed(!osintBox.classList.contains('collapsed'));
+  $('osint-head').addEventListener('click', osintToggle);
+  $('osint-toggle').addEventListener('click', e => { e.stopPropagation(); osintToggle(); });
 
   function refreshOsint(){
     renderOsint(Store.getPosts());

@@ -74,12 +74,16 @@ main{ flex:1; position:relative; min-height:0; }
 
 /* ── OSINT FEED (horizontal, sobreposto ao mapa) ────────── */
 .osint{
-  position:absolute; left:0; right:0; bottom:0; z-index:15;
-  pointer-events:none;
+  position:absolute; top:14px; right:14px; z-index:15;
+  width:400px; max-width:calc(100% - 28px);
+  background:rgba(10,14,21,.78); border:1px solid var(--border2);
+  border-radius:12px; backdrop-filter:blur(8px);
+  box-shadow:0 0 0 1px rgba(0,0,0,.45), 0 14px 34px rgba(0,0,0,.5),
+    inset 0 0 22px rgba(0,229,255,.04);
 }
 .osint .osint-head{
-  display:flex; align-items:center; gap:10px; padding:8px 16px;
-  pointer-events:auto;
+  display:flex; align-items:center; gap:10px; padding:9px 12px 9px 14px;
+  cursor:pointer; user-select:none;
 }
 .osint .osint-head h2{
   font:800 12px var(--mono); letter-spacing:2px; text-transform:uppercase;
@@ -91,17 +95,48 @@ main{ flex:1; position:relative; min-height:0; }
 .osint .osint-head .live::before{ content:''; width:7px; height:7px; border-radius:50%;
   background:var(--alert); animation:blink 1.3s infinite; }
 .osint .osint-head .count{ font:700 10px var(--mono); color:var(--muted); }
+.osint-toggle{
+  margin-left:auto; flex:none; background:none; border:1px solid var(--border2);
+  color:var(--cyan); width:26px; height:26px; border-radius:7px; cursor:pointer;
+  font:700 13px var(--mono); display:grid; place-items:center;
+  transition:border-color .18s, box-shadow .18s;
+}
+.osint-toggle:hover{ border-color:var(--cyan);
+  box-shadow:0 0 10px color-mix(in srgb, var(--cyan) 40%, transparent); }
 
 .osint .osint-viewport{
-  overflow:hidden; position:relative; height:178px; pointer-events:auto;
-  mask-image:linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
-  -webkit-mask-image:linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  overflow:hidden; position:relative; height:170px;
+  mask-image:linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent);
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent);
 }
 .osint .osint-track{
-  position:absolute; top:0; left:0; display:flex; gap:12px; padding:4px 24px;
+  position:absolute; top:0; left:0; display:flex; gap:12px; padding:6px 20px;
   white-space:nowrap; will-change:transform; animation:tk 55s linear infinite;
 }
 .osint:hover .osint-track{ animation-play-state:paused; }
+
+/* ── modo recolhido: vira um strip fino igual ao do header ── */
+.osint .osint-mini{ display:none; }
+.osint.collapsed{ width:auto; }
+.osint.collapsed .osint-viewport{ display:none; }
+.osint.collapsed .osint-head{ padding:6px 12px; }
+.osint.collapsed .osint-head .live, .osint.collapsed .osint-head .count{ display:none; }
+.osint.collapsed .osint-mini{
+  display:block; height:34px; overflow:hidden; position:relative;
+  border-top:1px solid var(--border);
+}
+.osint.collapsed .osint-mini .mini-track{
+  position:absolute; top:0; left:0; height:100%; display:flex; align-items:center; gap:0;
+  white-space:nowrap; animation:tk 40s linear infinite;
+}
+.osint.collapsed .osint-mini:hover .mini-track{ animation-play-state:paused; }
+.mini-item{
+  display:inline-flex; align-items:center; gap:9px; padding:0 18px; white-space:nowrap;
+  font:600 12px var(--font); color:var(--txt);
+  border-right:1px solid var(--border);
+}
+.mini-item .mi-time{ font:700 13px var(--display); color:var(--cyan);
+  text-shadow:0 0 8px color-mix(in srgb, var(--cyan) 50%, transparent); }
 
 /* card de boletim (horizontal) */
 .bcard{
@@ -146,6 +181,7 @@ main{ flex:1; position:relative; min-height:0; }
 
 /* responsivo */
 @media (max-width:720px){
-  .osint .osint-viewport{ height:190px; }
-  .bcard{ width:260px; }
+  .osint{ top:10px; right:10px; width:300px; }
+  .osint .osint-viewport{ height:150px; }
+  .bcard{ width:250px; }
 }
