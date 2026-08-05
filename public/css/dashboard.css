@@ -75,14 +75,14 @@ main{ flex:1; position:relative; min-height:0; }
 /* ── OSINT FEED (horizontal, sobreposto ao mapa) ────────── */
 .osint{
   position:absolute; top:14px; right:14px; z-index:15;
-  width:400px; max-width:calc(100% - 28px);
+  width:470px; max-width:calc(100% - 28px);
   background:rgba(10,14,21,.78); border:1px solid var(--border2);
   border-radius:12px; backdrop-filter:blur(8px);
   box-shadow:0 0 0 1px rgba(0,0,0,.45), 0 14px 34px rgba(0,0,0,.5),
     inset 0 0 22px rgba(0,229,255,.04);
 }
 .osint .osint-head{
-  display:flex; align-items:center; gap:10px; padding:9px 12px 9px 14px;
+  display:flex; align-items:center; gap:10px; padding:7px 12px 7px 14px;
   cursor:pointer; user-select:none;
 }
 .osint .osint-head h2{
@@ -117,9 +117,9 @@ main{ flex:1; position:relative; min-height:0; }
 
 /* ── modo recolhido: vira um strip fino igual ao do header ── */
 .osint .osint-mini{ display:none; }
-.osint.collapsed{ width:auto; }
+.osint.collapsed{ width:470px; }
 .osint.collapsed .osint-viewport{ display:none; }
-.osint.collapsed .osint-head{ padding:6px 12px; }
+.osint.collapsed .osint-head{ padding:5px 12px; }
 .osint.collapsed .osint-head .live, .osint.collapsed .osint-head .count{ display:none; }
 .osint.collapsed .osint-mini{
   display:block; height:34px; overflow:hidden; position:relative;
@@ -181,7 +181,8 @@ main{ flex:1; position:relative; min-height:0; }
 
 /* responsivo */
 @media (max-width:720px){
-  .osint{ top:10px; right:10px; width:300px; }
+  .osint{ top:10px; right:10px; width:310px; }
+  .osint.collapsed{ width:310px; }
   .osint .osint-viewport{ height:150px; }
   .bcard{ width:250px; }
 }
