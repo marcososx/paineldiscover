@@ -6,7 +6,7 @@ emergência em Brusque/SC. Dividida em duas visões:
 1. **Dashboard / Front-End** (`/`) — visualizador público/operacional com tema
    dark (estilo OSINT / Pizza Index), feed de boletins, ticker de notícias,
    status do plantão e mapa de crise incorporado.
-2. **Backoffice / Admin** (`/admin.html`) — alimentação rápida de boletins,
+2. **Backoffice / Admin** (`/admin`) — alimentação rápida de boletins,
    definição de nível de alerta e status de cobertura, gestão de usuários e
    alteração de senha.
 
@@ -15,7 +15,7 @@ emergência em Brusque/SC. Dividida em duas visões:
 ```
 public/
   index.html       → Dashboard público (raiz)
-  admin.html       → Painel administrativo
+  admin/           → Painel administrativo
   css/shared.css   → tema dark + componentes comuns
   css/dashboard.css
   css/admin.css
@@ -33,7 +33,7 @@ Basta servir a pasta `public/` com qualquer servidor estático:
 npx serve public        # ou: python3 -m http.server -d public
 ```
 
-Acesse `/` (painel público) e `/admin.html` (admin).
+Acesse `/` (painel público) e `/admin` (admin).
 
 ## Acesso inicial (admin)
 
