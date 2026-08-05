@@ -21,10 +21,10 @@
   let session = null;
 
   /* ── AUTH ─────────────────────────────────────────────── */
-  function doLogin(email, senha){
-    const u = Store.findByEmail(email);
+  function doLogin(ident, senha){
+    const u = Store.findByLogin(ident);
     if (!u || u.senha !== senha) return false;
-    session = { id: u.id, role: u.role, email: u.email, nome: u.nome || u.email };
+    session = { id: u.id, role: u.role, email: u.email, login: u.login, nome: u.nome || u.login || u.email };
     Store.setSession(session);
     return true;
   }
@@ -141,9 +141,12 @@
   $('user-form').addEventListener('submit', e => {
     e.preventDefault();
     const email = $('u-email').value.trim().toLowerCase();
-    if (Store.findByEmail(email)) return msg('err', 'Já existe um usuário com esse e-mail.');
+    if (Store.findByLogin(email)) return msg('err', 'Já existe um usuário com esse e-mail.');
+    const login = $('u-login').value.trim() || email.split('@')[0];
+    if (Store.findByLogin(login)) return msg('err', 'Já existe um usuário com esse login.');
     Store.addUser({
-      nome: $('u-nome').value.trim() || email,
+      nome: $('u-nome').value.trim() || login,
+      login,
       email,
       telefone: $('u-telefone').value.trim(),
       senha: $('u-senha').value || 'trocar123',
@@ -160,7 +163,7 @@
       return '<div class="user-item" data-id="' + u.id + '">'
         + '<div class="ui-avatar">' + esc((u.nome || '?')[0].toUpperCase()) + '</div>'
         + '<div class="ui-info"><b>' + esc(u.nome) + '</b>'
-        + '<span>' + esc(u.email) + (u.telefone ? ' · ' + esc(u.telefone) : '') + '</span></div>'
+        + '<span>' + esc(u.login || '') + (u.email ? ' · ' + esc(u.email) : '') + (u.telefone ? ' · ' + esc(u.telefone) : '') + '</span></div>'
         + '<span class="ui-role">' + (u.role === 'master' ? 'Master' : 'Operador') + '</span>'
         + '<div class="ui-actions">'
         + (u.role !== 'master' ? '<button class="mini-btn" data-reset="' + u.id + '">Redefinir senha</button>'

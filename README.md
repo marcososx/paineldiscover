@@ -35,13 +35,14 @@ npx serve public        # ou: python3 -m http.server -d public
 
 Acesse `/` (painel público) e `/admin` (admin).
 
-## Acesso inicial (admin)
+## Acesso inicial (super admin)
 
-| E-mail | Senha |
+| Login | Senha |
 |---|---|
-| `admin@brusquediscover.com.br` | `admin123` |
+| `marcososx` | `depoisamanha` |
 
-> Troque a senha do Admin Master no primeiro acesso (aba **Perfil**).
+> Troque a senha no primeiro acesso (aba **Perfil**). O login aceita o usuário
+> ou o e-mail do operador.
 
 ## Camada de dados
 

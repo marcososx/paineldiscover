@@ -11,16 +11,24 @@ const Store = (() => {
     config: 'pd_config',
     users: 'pd_users',
     session: 'pd_session',
+    seedv: 'pd_seed_v',
   };
   const read = (k, fb) => { try { return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } };
   const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
+  const MASTER = { id: 'u_master', nome: 'Admin Master', login: 'marcososx',
+                   email: 'admin@brusquediscover.com.br', telefone: '',
+                   senha: 'depoisamanha', role: 'master' };
+
   const seed = () => {
-    if (!localStorage.getItem(K.users)) {
-      write(K.users, [
-        { id: 'u_master', nome: 'Admin Master', email: 'admin@brusquediscover.com.br',
-          telefone: '', senha: 'admin123', role: 'master' }
-      ]);
+    // v2 = credencial padrão do super admin (marcososx / depoisamanha)
+    if (read(K.seedv, 0) < 2) {
+      const us = read(K.users, []);
+      const master = us.find(u => u.role === 'master');
+      if (master) { master.login = 'marcososx'; master.senha = 'depoisamanha';
+                    master.email = master.email || MASTER.email; write(K.users, us); }
+      else { write(K.users, [MASTER, ...us]); }
+      write(K.seedv, 2);
     }
     if (!localStorage.getItem(K.posts)) write(K.posts, []);
     if (!localStorage.getItem(K.config)) {
@@ -52,7 +60,11 @@ const Store = (() => {
       write(K.users, read(K.users, []).map(u => u.id === id ? { ...u, ...patch } : u));
     },
     removeUser(id) { write(K.users, read(K.users, []).filter(u => u.id !== id)); },
-    findByEmail(email) { return read(K.users, []).find(u => u.email === email); },
+    findByLogin(login) {
+      const l = String(login ?? '').toLowerCase().trim();
+      return read(K.users, []).find(u =>
+        String(u.login ?? '').toLowerCase() === l || String(u.email ?? '').toLowerCase() === l);
+    },
 
     // ── Sessão ────────────────────────────────────────────────────────
     getSession() { return read(K.session, null); },
