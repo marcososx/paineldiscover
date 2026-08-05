@@ -128,7 +128,7 @@ main{ flex:1; position:relative; min-height:0; }
 }
 .osint .osint-track{
   position:relative; display:flex; gap:12px; padding:6px 20px;
-  white-space:nowrap; will-change:transform; animation:tk 38s linear infinite;
+  white-space:nowrap; will-change:transform; animation:tk 22s linear infinite;
 }
 .osint:hover .osint-track{ animation-play-state:paused; }
 
@@ -144,7 +144,7 @@ main{ flex:1; position:relative; min-height:0; }
 }
 .osint.collapsed .osint-mini .mini-track{
   position:absolute; top:0; left:0; height:100%; display:flex; align-items:center; gap:0;
-  white-space:nowrap; animation:tk 40s linear infinite;
+  white-space:nowrap; animation:tk 24s linear infinite;
 }
 .osint.collapsed .osint-mini:hover .mini-track{ animation-play-state:paused; }
 .mini-item{
