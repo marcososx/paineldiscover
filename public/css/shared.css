@@ -2,22 +2,26 @@
    Painel de Crise Brusque Discover — tema dark (OSINT/Pizza Index)
    ============================================================ */
 :root{
-  --bg:#07090d;
-  --bg2:#0a0d13;
-  --panel:#0e1219;
-  --panel2:#141a24;
-  --border:#1e2734;
-  --border2:#2a3648;
-  --txt:#e2e9f1;
-  --muted:#8a97a8;
-  --accent:#00B0FF;
-  --green:#00E676;
-  --amber:#FFB300;
-  --red:#FF3B30;
-  --font:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --bg:#080a0d;
+  --bg2:#0b0e13;
+  --panel:#111827;
+  --panel2:#1a202c;
+  --border:#252d3a;
+  --border2:#2f3a4c;
+  --txt:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#3ba4ff;
+  --cyan:#00b7d7;
+  --green:#22c55e;
+  --amber:#ffd600;
+  --orange:#ff7a00;
+  --red:#fb2c36;
+  --purple:#c400ff;
+  --font:"Geist","Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
+  --display:"VT323","Geist Mono",ui-monospace,monospace;
   --radius:10px;
-  --shadow:0 10px 30px rgba(0,0,0,.45);
+  --shadow:0 10px 30px rgba(0,0,0,.5);
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 html,body{ height:100%; }
@@ -32,7 +36,6 @@ body{
 body[data-alert="normalidade"]{ --alert:var(--green); }
 body[data-alert="atencao"]    { --alert:var(--amber); }
 body[data-alert="emergencia"] { --alert:var(--red);   }
-
 /* badges */
 .badge{
   display:inline-flex; align-items:center; gap:8px;

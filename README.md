@@ -4,8 +4,9 @@ Ferramenta estratégica de gestão de comunicação e monitoramento em situaçõ
 emergência em Brusque/SC. Dividida em duas visões:
 
 1. **Dashboard / Front-End** (`/`) — visualizador público/operacional com tema
-   dark (estilo OSINT / Pizza Index), feed de boletins, ticker de notícias,
-   status do plantão e mapa de crise incorporado.
+   dark (estilo OSINT / Pizza Index): ticker com as **últimas 10 notícias do
+   Brusque Discover** (atualizadas a cada minuto), **feed OSINT horizontal**
+   sobreposto ao mapa com os boletins do QG, status do plantão e nível de alerta.
 2. **Backoffice / Admin** (`/admin`) — alimentação rápida de boletins,
    definição de nível de alerta e status de cobertura, gestão de usuários e
    alteração de senha.
@@ -13,17 +14,25 @@ emergência em Brusque/SC. Dividida em duas visões:
 ## Estrutura
 
 ```
+src/index.js       → Worker (assets + endpoint /api/news das notícias)
 public/
   index.html       → Dashboard público (raiz)
   admin/           → Painel administrativo
+  img/logo.png     → logo do Brusque Discover
   css/shared.css   → tema dark + componentes comuns
   css/dashboard.css
   css/admin.css
   js/store.js      → camada de dados (localStorage agora; pronta p/ trocar por API)
   js/dashboard.js
   js/admin.js
-wrangler.jsonc     → deploy em Cloudflare Workers (assets estáticos)
+wrangler.jsonc     → deploy em Cloudflare Workers (assets estáticos + worker)
 ```
+
+## Notícias do Brusque Discover
+
+O ticker do dashboard busca em `GET /api/news` (no próprio Worker) as **10
+últimas notícias** publicadas no site, via API REST do Supabase do
+Brusque Discover. O dashboard consulta a cada **1 minuto**.
 
 ## Execução local
 

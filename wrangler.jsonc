@@ -4,6 +4,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "paineldiscover",
   "compatibility_date": "2025-07-01",
+  "main": "src/index.js",
   "assets": { "directory": "./public" },
   "observability": { "enabled": true }
 }

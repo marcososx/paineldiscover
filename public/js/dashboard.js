@@ -3,6 +3,9 @@
   'use strict';
   Store.init();
 
+  const NEWS_URL = '/api/news';
+  const NEWS_INTERVAL = 60000; // monitora a cada 1 minuto
+
   const ALERT_LABEL = {
     normalidade: 'Normalidade',
     atencao: 'Atenção',
@@ -15,9 +18,9 @@
   };
 
   const $ = id => document.getElementById(id);
-  const feedList = $('feed-list');
-  const track = $('ticker-track');
-  const maxChars = 160;
+  const track = $('ticker-track');        // notícias
+  const osintTrack = $('osint-track');    // boletins (feed horizontal)
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   const timeHm = ts => {
     const d = new Date(ts);
@@ -30,59 +33,67 @@
     if (s < 86400) return Math.floor(s/3600) + 'h';
     return Math.floor(s/86400) + 'd';
   };
-  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+  /* ── Configurações globais ─────────────────────────────── */
   function renderConfig(cfg){
     document.body.setAttribute('data-alert', cfg.nivelAlerta || 'normalidade');
-    const al = $('alerta-txt'), cb = $('cobertura-txt');
-    al.textContent = ALERT_LABEL[cfg.nivelAlerta] || cfg.nivelAlerta;
-    cb.textContent = COBERTURA_LABEL[cfg.statusCobertura] || cfg.statusCobertura;
-    document.querySelector('#alerta').style.setProperty('--alert',
-      getComputedStyle(document.body).getPropertyValue('--alert'));
+    $('alerta-txt').textContent = ALERT_LABEL[cfg.nivelAlerta] || cfg.nivelAlerta;
+    $('cobertura-txt').textContent = COBERTURA_LABEL[cfg.statusCobertura] || cfg.statusCobertura;
   }
 
-  function renderFeed(posts){
-    if (!posts.length){
-      feedList.innerHTML = '<div class="feed-empty">Sem boletins ainda. O QG vai publicar aqui em breve.</div>';
+  /* ── Ticker: últimas 10 notícias (título apenas) ───────── */
+  function renderTicker(items){
+    if (!items || !items.length){
+      track.innerHTML = '<span class="tk-item">Aguardando notícias do Brusque Discover…</span>';
       return;
     }
-    feedList.innerHTML = posts.map(p => {
-      const link = p.url ? '<a class="link" href="' + esc(p.url) + '" target="_blank" rel="noopener">'
-        + esc(p.labelLink || 'Ver mais') + ' &nearr;</a>' : '';
-      return '<article class="osit">'
-        + '<div class="ot"><span>' + timeHm(p.ts) + '</span><span class="ago">' + ago(p.ts) + '</span></div>'
-        + '<h3>' + esc(p.titulo) + '</h3>'
-        + '<p>' + esc(p.resumo) + '</p>'
-        + link
-        + '</article>';
-    }).join('');
-  }
-
-  function renderTicker(posts){
-    const last10 = posts.slice(0, 10);
-    if (!last10.length){
-      track.innerHTML = '<span class="tk-item">Aguardando publicação…</span>';
-      return;
-    }
-    const item = p => '<span class="tk-item">'
-      + '<span class="tk-time">' + timeHm(p.ts) + '</span>'
-      + esc(p.titulo)
-      + (p.url ? '<a href="' + esc(p.url) + '" target="_blank" rel="noopener" title="' + esc(p.labelLink || 'Abrir link') + '">&#128279;</a>' : '')
+    const item = n => '<span class="tk-item">'
+      + esc(n.titulo)
+      + (n.url ? '<a href="' + esc(n.url) + '" target="_blank" rel="noopener" title="Abrir matéria">&#128279;</a>' : '')
       + '</span>';
-    // duplica o track para o loop ser contínuo
-    track.innerHTML = last10.map(item).join('') + last10.map(item).join('');
+    track.innerHTML = items.map(item).join('') + items.map(item).join('');
   }
 
-  function refresh(){
-    const cfg = Store.getConfig();
-    const posts = Store.getPosts();
-    renderConfig(cfg);
-    renderFeed(posts);
-    renderTicker(posts);
+  async function loadNews(){
+    try {
+      const res = await fetch(NEWS_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      const d = await res.json();
+      renderTicker(d.items || []);
+      $('statusbar').textContent = 'brusquediscover.com.br · atualizado ' + timeHm(Date.now()) + ' · minuto a minuto';
+    } catch (e) {
+      // mantém o último ticker; mostra o fallback se nunca carregou
+      if (!$('ticker-track').dataset.loaded) renderTicker(null);
+    }
   }
 
-  refresh();
-  // atualiza quando o admin grava (mesma aba) ou quando outra aba/publicação muda
-  window.addEventListener('storage', refresh);
-  setInterval(refresh, 4000);
+  /* ── OSINT Feed: boletins (horizontal, sobreposto ao mapa) ─ */
+  function renderOsint(posts){
+    $('osint-count').textContent = posts.length ? posts.length + ' boletins' : '';
+    if (!posts.length){
+      osintTrack.innerHTML = '<div class="bcard"><h3>Aguardando publicação</h3><p>O QG vai publicar aqui em breve.</p></div>';
+      return;
+    }
+    const card = p => '<article class="bcard">'
+      + '<div class="bt-time"><span>' + timeHm(p.ts) + '</span><span class="ago">' + ago(p.ts) + '</span></div>'
+      + '<h3>' + esc(p.titulo) + '</h3>'
+      + '<p>' + esc(p.resumo) + '</p>'
+      + (p.url ? '<a class="link" href="' + esc(p.url) + '" target="_blank" rel="noopener">'
+          + esc(p.labelLink || 'Ver mais') + ' &nearr;</a>' : '')
+      + '</article>';
+    osintTrack.innerHTML = posts.map(card).join('') + posts.map(card).join('');
+  }
+
+  function refreshOsint(){
+    renderOsint(Store.getPosts());
+  }
+
+  /* ── INIT ──────────────────────────────────────────────── */
+  renderConfig(Store.getConfig());
+  refreshOsint();
+  loadNews();
+
+  window.addEventListener('storage', () => { renderConfig(Store.getConfig()); refreshOsint(); });
+  setInterval(() => { renderConfig(Store.getConfig()); refreshOsint(); }, 4000);
+  setInterval(loadNews, NEWS_INTERVAL);
 })();
