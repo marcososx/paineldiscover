@@ -128,7 +128,7 @@ main{ flex:1; position:relative; min-height:0; }
 }
 .osint .osint-track{
   position:relative; display:flex; gap:12px; padding:6px 20px;
-  white-space:nowrap; will-change:transform; animation:tk 55s linear infinite;
+  white-space:nowrap; will-change:transform; animation:tk 38s linear infinite;
 }
 .osint:hover .osint-track{ animation-play-state:paused; }
 
