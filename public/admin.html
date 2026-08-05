@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brusque Discover — Painel Administrativo</title>
+<link rel="stylesheet" href="css/shared.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ── LOGIN ───────────────────────────────────────────── -->
+  <div id="view-login">
+    <div class="login-card">
+      <div class="brand">
+        <div class="logo">BD</div>
+        <div>
+          <h1>Painel Administrativo</h1>
+          <p>Acesso restrito ao plantão Brusque Discover</p>
+        </div>
+      </div>
+      <form id="login-form" autocomplete="off">
+        <div class="field">
+          <label for="lg-email">E-mail</label>
+          <input id="lg-email" type="email" placeholder="voce@brusquediscover.com.br" required>
+        </div>
+        <div class="field">
+          <label for="lg-senha">Senha</label>
+          <input id="lg-senha" type="password" placeholder="••••••••" required>
+        </div>
+        <div class="msg err" id="login-msg">Credenciais inválidas</div>
+        <button class="btn primary" type="submit">Entrar</button>
+      </form>
+      <div class="login-meta">Acesso inicial: admin@brusquediscover.com.br · admin123</div>
+    </div>
+  </div>
+
+  <!-- ── PAINEL ───────────────────────────────────────────── -->
+  <div id="view-panel">
+    <div class="topbar">
+      <div class="brand"><span class="logo">BD</span> Brusque Discover</div>
+      <nav class="tabs" id="tabs">
+        <button data-tab="boletins" class="on">Boletins</button>
+        <button data-tab="config">Configurações</button>
+        <button data-tab="usuarios" id="tab-usuarios">Usuários</button>
+        <button data-tab="perfil">Perfil</button>
+      </nav>
+      <div class="tb-right">
+        <a class="btn" href="index.html" target="_blank" rel="noopener">Ver painel público</a>
+        <span class="who"><b id="who-name">—</b></span>
+        <button class="btn danger" id="btn-sair">Sair</button>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div id="msgbar" class="msg-bar"></div>
+
+      <!-- BOLETINS -->
+      <section class="tab show" id="tab-boletins">
+        <h2>Novo boletim</h2>
+        <p class="sub">Publicação ultrarrápida no formato OSINT (microblogging).</p>
+        <form class="post-form" id="post-form" autocomplete="off">
+          <div class="field">
+            <label for="p-titulo">Título <span id="p-titulo-count" class="hint">0/30</span></label>
+            <input id="p-titulo" maxlength="30" placeholder="Ex: Ponte Interditada" required>
+          </div>
+          <div class="field">
+            <label for="p-link">URL do link</label>
+            <input id="p-link" type="url" placeholder="https://…">
+          </div>
+          <div class="field full">
+            <label for="p-resumo">Resumo / conteúdo <span id="p-resumo-count" class="hint">0/160</span></label>
+            <textarea id="p-resumo" maxlength="160" placeholder="Descrição sintetizada da situação…" required></textarea>
+          </div>
+          <div class="field">
+            <label for="p-label">Label do link</label>
+            <input id="p-label" maxlength="40" placeholder="Ver Nota Oficial">
+          </div>
+          <div class="actions">
+            <button class="btn primary" type="submit">Publicar</button>
+          </div>
+        </form>
+        <h2 style="margin-top:26px">Boletins publicados</h2>
+        <p class="sub">Os mais recentes aparecem no topo do feed público.</p>
+        <div class="post-list" id="post-list"></div>
+      </section>
+
+      <!-- CONFIGURAÇÕES -->
+      <section class="tab" id="tab-config">
+        <h2>Configurações globais</h2>
+        <p class="sub">Esses parâmetros controlam o estado exibido no painel público.</p>
+        <div class="cfg-grid">
+          <div class="field">
+            <label for="c-alerta">Nível de alerta da crise</label>
+            <select id="c-alerta">
+              <option value="normalidade">Normalidade</option>
+              <option value="atencao">Atenção</option>
+              <option value="emergencia">Emergência</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="c-cobertura">Status de cobertura da crise</label>
+            <select id="c-cobertura">
+              <option value="plantao">Estamos de plantão QG Discover</option>
+              <option value="painel">Estamos ao vivo no painel de crise</option>
+              <option value="live">Estamos em live (Instagram Discover)</option>
+            </select>
+          </div>
+          <div class="full">
+            <button class="btn primary" id="btn-save-config">Salvar configurações</button>
+          </div>
+        </div>
+        <div class="preview-banner">
+          <div class="pb-badge" id="pv-badge"><span class="dot"></span> <span id="pv-badge-txt">—</span></div>
+          <div class="pb-txt" id="pv-txt">—</div>
+        </div>
+      </section>
+
+      <!-- USUÁRIOS -->
+      <section class="tab" id="tab-usuarios">
+        <h2>Usuários</h2>
+        <p class="sub">Cadastro imediato: e-mail, telefone e senha provisória. Sem e-mail de confirmação.</p>
+        <form class="user-form" id="user-form" autocomplete="off">
+          <div class="field">
+            <label for="u-nome">Nome (opcional)</label>
+            <input id="u-nome" placeholder="Nome do operador">
+          </div>
+          <div class="field">
+            <label for="u-email">E-mail</label>
+            <input id="u-email" type="email" placeholder="operador@…" required>
+          </div>
+          <div class="field">
+            <label for="u-telefone">Telefone</label>
+            <input id="u-telefone" type="tel" placeholder="(47) 9 0000-0000" required>
+          </div>
+          <div class="field">
+            <label for="u-senha">Senha provisória</label>
+            <input id="u-senha" placeholder="Definida pelo admin" required>
+          </div>
+          <div class="actions">
+            <button class="btn primary" type="submit">Criar usuário</button>
+          </div>
+        </form>
+        <div class="user-list" id="user-list"></div>
+      </section>
+
+      <!-- PERFIL -->
+      <section class="tab" id="tab-perfil">
+        <h2>Meu perfil</h2>
+        <p class="sub">Altere sua senha. A recuperação é feita manualmente pelo Admin Master.</p>
+        <div class="profile-grid">
+          <div class="field">
+            <label>E-mail</label>
+            <input id="pf-email" disabled>
+          </div>
+          <div class="field">
+            <label for="pf-telefone">Telefone</label>
+            <input id="pf-telefone" type="tel">
+          </div>
+          <div class="field">
+            <label for="pf-atual">Senha atual</label>
+            <input id="pf-atual" type="password">
+          </div>
+          <div class="field">
+            <label for="pf-nova">Nova senha</label>
+            <input id="pf-nova" type="password">
+          </div>
+          <div class="full">
+            <button class="btn primary" id="btn-save-perfil">Salvar</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script src="js/store.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

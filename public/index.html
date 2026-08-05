@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-alert="normalidade">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brusque Discover — Painel de Crise</title>
+<link rel="stylesheet" href="css/shared.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
+  <header>
+    <div class="brand">
+      <div class="logo">BD</div>
+      <div class="bt">Brusque Discover<small>Painel de Crise</small></div>
+    </div>
+    <div class="hd-right">
+      <div class="badge" id="cobertura"><span class="dot"></span><span id="cobertura-txt">Carregando…</span></div>
+      <div class="badge alert" id="alerta"><span class="dot"></span><span id="alerta-txt">—</span></div>
+    </div>
+  </header>
+
+  <!-- ── TICKER / CRAWL ──────────────────────────────────── -->
+  <div class="ticker">
+    <div class="tk-label">Feed</div>
+    <div class="tk-viewport"><div class="tk-track" id="ticker-track"></div></div>
+  </div>
+
+  <!-- ── CORPO ───────────────────────────────────────────── -->
+  <main>
+    <section class="map">
+      <div class="map-tag">Mapa de Crise</div>
+      <iframe id="mapa" src="https://brusque-maps.marcososx.workers.dev" title="Mapa de Crise Brusque"></iframe>
+    </section>
+    <aside class="feed">
+      <div class="feed-head">
+        <h2>Feed OSINT</h2>
+        <span class="live">ao vivo</span>
+      </div>
+      <div class="feed-list" id="feed-list"></div>
+    </aside>
+  </main>
+
+<script src="js/store.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

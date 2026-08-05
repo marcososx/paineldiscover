@@ -1,0 +1,121 @@
+/* Admin / Backoffice — painel de gestão */
+body{ min-height:100vh; }
+
+/* ── LOGIN ─────────────────────────────────────────────── */
+#view-login{
+  min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.login-card{
+  width:100%; max-width:380px; background:var(--panel);
+  border:1px solid var(--border); border-radius:14px; padding:28px;
+  box-shadow:var(--shadow);
+}
+.login-card .brand{ display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+.login-card .logo{
+  width:40px; height:40px; border-radius:10px; display:grid; place-items:center;
+  background:linear-gradient(135deg, var(--alert), var(--accent)); color:#04121c;
+  font:900 20px var(--mono);
+}
+.login-card h1{ font:800 17px var(--font); }
+.login-card p{ font:500 12px var(--muted); margin-top:2px; }
+.login-card form{ display:flex; flex-direction:column; gap:14px; }
+.login-card .msg{ font:500 12px var(--font); padding:8px 10px; border-radius:6px; display:none; }
+.login-card .msg.err{ display:block; color:var(--red); background:color-mix(in srgb, var(--red) 10%, transparent); }
+.login-meta{ margin-top:18px; font:500 11px var(--muted); text-align:center; }
+
+/* ── PAINEL ────────────────────────────────────────────── */
+#view-panel{ display:none; min-height:100vh; flex-direction:column; }
+#view-panel.show{ display:flex; }
+.topbar{
+  display:flex; align-items:center; gap:18px; padding:10px 18px;
+  background:rgba(10,13,19,.92); border-bottom:1px solid var(--border); flex:none; flex-wrap:wrap;
+}
+.topbar .brand{ display:flex; align-items:center; gap:10px; font:800 14px var(--font); }
+.topbar .brand .logo{
+  width:28px; height:28px; border-radius:7px; display:grid; place-items:center;
+  background:linear-gradient(135deg, var(--accent), #0a5f8f); color:#04121c; font:900 14px var(--mono);
+}
+.tabs{ display:flex; gap:4px; flex:1; }
+.tabs button{
+  border:0; background:transparent; color:var(--muted); cursor:pointer;
+  font:600 13px var(--font); padding:9px 13px; border-radius:8px; transition:all .16s;
+}
+.tabs button:hover{ color:var(--txt); background:rgba(255,255,255,.04); }
+.tabs button.on{ color:#04121c; background:var(--accent); }
+.topbar .tb-right{ display:flex; align-items:center; gap:10px; }
+.topbar .who{ font:600 12px var(--font); color:var(--muted); }
+.topbar .who b{ color:var(--txt); }
+
+.panel-body{ flex:1; padding:20px; max-width:980px; width:100%; margin:0 auto; }
+.tab{ display:none; }
+.tab.show{ display:block; }
+.tab h2{ font:800 15px var(--font); margin-bottom:4px; }
+.tab .sub{ font:500 12px var(--muted); margin-bottom:18px; }
+
+/* boletins */
+.post-form{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.post-form .full{ grid-column:1 / -1; }
+.post-form .actions{ grid-column:1 / -1; display:flex; gap:10px; justify-content:flex-end; }
+.post-list{ margin-top:22px; display:flex; flex-direction:column; gap:10px; }
+.post-item{
+  background:var(--bg2); border:1px solid var(--border); border-radius:9px;
+  padding:12px 14px; display:flex; gap:14px; align-items:flex-start;
+}
+.post-item .pi-main{ flex:1; min-width:0; }
+.post-item .pi-time{ font:600 11px var(--mono); color:var(--muted); }
+.post-item h4{ font:700 14px var(--font); margin-top:2px; }
+.post-item p{ font:500 13px var(--font); color:#c4d0dd; margin-top:3px; }
+.post-item .pi-link{ font:600 12px var(--accent); text-decoration:none; display:inline-flex; gap:6px; margin-top:6px; }
+.post-item .pi-del{ flex:none; background:none; border:0; color:var(--red); cursor:pointer; font-size:16px; opacity:.7; }
+.post-item .pi-del:hover{ opacity:1; }
+
+/* configurações globais */
+.cfg-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:640px; }
+.cfg-grid .full{ grid-column:1 / -1; }
+.preview-banner{
+  margin-top:16px; max-width:640px; border-radius:9px; padding:14px 16px; border:1px solid var(--border);
+  background:var(--bg2);
+}
+.preview-banner .pb-badge{ display:inline-flex; align-items:center; gap:8px; font:700 13px var(--font);
+  padding:6px 12px; border-radius:999px; color:var(--alert);
+  border:1px solid color-mix(in srgb, var(--alert) 45%, transparent);
+  background:color-mix(in srgb, var(--alert) 12%, transparent); }
+.preview-banner .pb-txt{ margin-top:10px; font:500 12px var(--muted); }
+
+/* usuários */
+.user-form{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:780px; }
+.user-form .actions{ grid-column:1 / -1; display:flex; gap:10px; justify-content:flex-end; }
+.user-list{ margin-top:20px; display:flex; flex-direction:column; gap:8px; max-width:780px; }
+.user-item{
+  display:flex; align-items:center; gap:14px; background:var(--bg2);
+  border:1px solid var(--border); border-radius:9px; padding:10px 14px;
+}
+.user-item .ui-avatar{
+  width:34px; height:34px; border-radius:8px; display:grid; place-items:center; flex:none;
+  background:var(--panel2); font:800 13px var(--mono); color:var(--accent);
+}
+.user-item .ui-info{ flex:1; min-width:0; }
+.user-item .ui-info b{ display:block; font:700 13px var(--font); }
+.user-item .ui-info span{ font:500 12px var(--muted); }
+.user-item .ui-role{ font:600 10px var(--mono); text-transform:uppercase; letter-spacing:.5px;
+  padding:3px 8px; border-radius:5px; color:var(--accent); border:1px solid color-mix(in srgb,var(--accent) 40%, transparent); }
+.user-item .ui-actions{ display:flex; gap:6px; }
+.mini-btn{
+  background:none; border:1px solid var(--border2); color:var(--muted); cursor:pointer;
+  font:600 11px var(--font); padding:5px 9px; border-radius:6px;
+}
+.mini-btn:hover{ color:var(--txt); border-color:var(--accent); }
+.mini-btn.danger:hover{ color:var(--red); border-color:var(--red); }
+.mini-btn:disabled{ opacity:.4; cursor:default; }
+
+/* perfil */
+.profile-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:640px; }
+
+.msg-bar{ padding:10px 14px; border-radius:8px; margin-bottom:16px; display:none; font:600 13px var(--font); }
+.msg-bar.ok{ display:block; color:var(--green); background:color-mix(in srgb, var(--green) 12%, transparent); }
+.msg-bar.err{ display:block; color:var(--red); background:color-mix(in srgb, var(--red) 12%, transparent); }
+
+@media (max-width:760px){
+  .post-form, .cfg-grid, .user-form, .profile-grid{ grid-template-columns:1fr; }
+  .user-form .actions, .post-form .actions{ grid-column:1; }
+}

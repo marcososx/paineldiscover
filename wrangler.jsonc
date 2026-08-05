@@ -1,0 +1,9 @@
+{
+  // Painel de Crise Brusque Discover — site estático servido por Worker de assets.
+  // Página pública = / (dashboard). Admin = /admin.html.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "paineldiscover",
+  "compatibility_date": "2025-07-01",
+  "assets": { "directory": "./public" },
+  "observability": { "enabled": true }
+}

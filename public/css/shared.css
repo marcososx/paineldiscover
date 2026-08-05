@@ -1,0 +1,83 @@
+/* ============================================================
+   Painel de Crise Brusque Discover — tema dark (OSINT/Pizza Index)
+   ============================================================ */
+:root{
+  --bg:#07090d;
+  --bg2:#0a0d13;
+  --panel:#0e1219;
+  --panel2:#141a24;
+  --border:#1e2734;
+  --border2:#2a3648;
+  --txt:#e2e9f1;
+  --muted:#8a97a8;
+  --accent:#00B0FF;
+  --green:#00E676;
+  --amber:#FFB300;
+  --red:#FF3B30;
+  --font:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --radius:10px;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ height:100%; }
+body{
+  background:radial-gradient(1200px 600px at 70% -10%, #0d1520 0%, var(--bg) 55%);
+  color:var(--txt);
+  font-family:var(--font);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Nível de alerta → cor de destaque global */
+body[data-alert="normalidade"]{ --alert:var(--green); }
+body[data-alert="atencao"]    { --alert:var(--amber); }
+body[data-alert="emergencia"] { --alert:var(--red);   }
+
+/* badges */
+.badge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 12px; border-radius:999px;
+  border:1px solid var(--border2);
+  background:rgba(255,255,255,.03);
+  font:600 12px var(--font); letter-spacing:.3px; color:var(--muted);
+  white-space:nowrap;
+}
+.badge .dot{ width:8px; height:8px; border-radius:50%; background:currentColor;
+  box-shadow:0 0 0 0 currentColor; animation:blink 1.6s infinite; }
+@keyframes blink{ 50%{ box-shadow:0 0 0 5px color-mix(in srgb, currentColor 25%, transparent); } }
+.badge.alert{ color:var(--alert); border-color:color-mix(in srgb, var(--alert) 45%, transparent);
+  background:color-mix(in srgb, var(--alert) 12%, transparent); }
+
+/* botões */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px; border-radius:8px; cursor:pointer;
+  font:600 13px var(--font); letter-spacing:.2px; border:1px solid var(--border2);
+  background:var(--panel2); color:var(--txt);
+  transition:border-color .18s, background .18s, transform .08s;
+}
+.btn:hover{ border-color:var(--accent); }
+.btn:active{ transform:translateY(1px); }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:#04121c; }
+.btn.primary:hover{ filter:brightness(1.1); }
+.btn.danger{ border-color:color-mix(in srgb, var(--red) 50%, transparent); color:var(--red); }
+.btn.danger:hover{ background:color-mix(in srgb, var(--red) 14%, transparent); }
+
+/* campos */
+.field{ display:flex; flex-direction:column; gap:6px; }
+.field label{ font:600 11px var(--font); letter-spacing:.4px; text-transform:uppercase; color:var(--muted); }
+.field input, .field select, .field textarea{
+  background:var(--bg2); color:var(--txt); border:1px solid var(--border2);
+  border-radius:8px; padding:10px 12px; font:500 14px var(--font);
+  outline:none; transition:border-color .18s;
+}
+.field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
+.field textarea{ resize:vertical; min-height:70px; }
+.hint{ font-size:11px; color:var(--muted); margin-top:4px; }
+.hint b{ color:var(--txt); }
+
+/* painéis/cards */
+.card{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px;
+}
