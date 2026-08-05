@@ -1,32 +1,33 @@
 /* ============================================================
-   Painel de Crise Brusque Discover — tema dark (OSINT/Pizza Index)
+   Painel de Crise Brusque Discover — tema dark neon (OSINT/Pizza Index)
    ============================================================ */
 :root{
-  --bg:#080a0d;
-  --bg2:#0b0e13;
-  --panel:#111827;
-  --panel2:#1a202c;
-  --border:#252d3a;
-  --border2:#2f3a4c;
-  --txt:#e5e7eb;
-  --muted:#9ca3af;
+  --bg:#05070b;
+  --bg2:#0a0e15;
+  --panel:#0e1520;
+  --panel2:#161f2e;
+  --border:#23304a;
+  --border2:#2e3d5c;
+  --txt:#eef2f8;
+  --muted:#8fa2ba;
   --accent:#3ba4ff;
-  --cyan:#00b7d7;
-  --green:#22c55e;
-  --amber:#ffd600;
-  --orange:#ff7a00;
-  --red:#fb2c36;
+  --cyan:#00e5ff;
+  --green:#00ff9d;
+  --amber:#ffe600;
+  --orange:#ff9d00;
+  --red:#ff2d55;
   --purple:#c400ff;
   --font:"Geist","Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
   --display:"VT323","Geist Mono",ui-monospace,monospace;
   --radius:10px;
-  --shadow:0 10px 30px rgba(0,0,0,.5);
+  --shadow:0 12px 34px rgba(0,0,0,.55);
+  --border-w:1px;
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 html,body{ height:100%; }
 body{
-  background:radial-gradient(1200px 600px at 70% -10%, #0d1520 0%, var(--bg) 55%);
+  background:radial-gradient(1100px 600px at 72% -10%, #101a2b 0%, var(--bg) 58%);
   color:var(--txt);
   font-family:var(--font);
   -webkit-font-smoothing:antialiased;
@@ -36,45 +37,62 @@ body{
 body[data-alert="normalidade"]{ --alert:var(--green); }
 body[data-alert="atencao"]    { --alert:var(--amber); }
 body[data-alert="emergencia"] { --alert:var(--red);   }
+
+/* borda neon genérica */
+.neon{ border:var(--border-w) solid var(--alert); box-shadow:0 0 10px color-mix(in srgb, var(--alert) 45%, transparent),
+       0 0 26px color-mix(in srgb, var(--alert) 20%, transparent), inset 0 0 12px color-mix(in srgb, var(--alert) 12%, transparent); }
+
 /* badges */
 .badge{
   display:inline-flex; align-items:center; gap:8px;
-  padding:7px 12px; border-radius:999px;
+  padding:7px 13px; border-radius:7px;
   border:1px solid var(--border2);
-  background:rgba(255,255,255,.03);
-  font:600 12px var(--font); letter-spacing:.3px; color:var(--muted);
+  background:color-mix(in srgb, var(--border2) 26%, transparent);
+  font:700 11px var(--mono); letter-spacing:.7px; text-transform:uppercase; color:var(--muted);
   white-space:nowrap;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4), inset 0 0 14px rgba(59,164,255,.05);
 }
 .badge .dot{ width:8px; height:8px; border-radius:50%; background:currentColor;
-  box-shadow:0 0 0 0 currentColor; animation:blink 1.6s infinite; }
-@keyframes blink{ 50%{ box-shadow:0 0 0 5px color-mix(in srgb, currentColor 25%, transparent); } }
-.badge.alert{ color:var(--alert); border-color:color-mix(in srgb, var(--alert) 45%, transparent);
-  background:color-mix(in srgb, var(--alert) 12%, transparent); }
+  box-shadow:0 0 8px currentColor; animation:blink 1.6s infinite; }
+@keyframes blink{ 50%{ box-shadow:0 0 0 6px color-mix(in srgb, currentColor 30%, transparent); } }
+.badge.alert{
+  color:var(--alert); border-color:color-mix(in srgb, var(--alert) 70%, transparent);
+  background:color-mix(in srgb, var(--alert) 12%, transparent);
+  box-shadow:0 0 12px color-mix(in srgb, var(--alert) 40%, transparent),
+             inset 0 0 14px color-mix(in srgb, var(--alert) 10%, transparent);
+}
 
 /* botões */
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
   padding:10px 16px; border-radius:8px; cursor:pointer;
-  font:600 13px var(--font); letter-spacing:.2px; border:1px solid var(--border2);
-  background:var(--panel2); color:var(--txt);
-  transition:border-color .18s, background .18s, transform .08s;
+  font:600 13px var(--font); letter-spacing:.2px;
+  border:1px solid var(--border2); background:var(--panel2); color:var(--txt);
+  transition:border-color .18s, background .18s, transform .08s, box-shadow .18s;
 }
-.btn:hover{ border-color:var(--accent); }
+.btn:hover{ border-color:var(--accent);
+  box-shadow:0 0 10px color-mix(in srgb, var(--accent) 40%, transparent), 0 0 24px color-mix(in srgb, var(--accent) 18%, transparent); }
 .btn:active{ transform:translateY(1px); }
-.btn.primary{ background:var(--accent); border-color:var(--accent); color:#04121c; }
-.btn.primary:hover{ filter:brightness(1.1); }
-.btn.danger{ border-color:color-mix(in srgb, var(--red) 50%, transparent); color:var(--red); }
-.btn.danger:hover{ background:color-mix(in srgb, var(--red) 14%, transparent); }
+.btn.primary{ background:var(--accent); border-color:var(--accent); color:#04121c;
+  box-shadow:0 0 14px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 30px color-mix(in srgb, var(--accent) 25%, transparent); }
+.btn.primary:hover{ filter:brightness(1.12); }
+.btn.danger{ border-color:color-mix(in srgb, var(--red) 60%, transparent); color:var(--red); }
+.btn.danger:hover{ background:color-mix(in srgb, var(--red) 12%, transparent);
+  box-shadow:0 0 10px color-mix(in srgb, var(--red) 40%, transparent); }
 
 /* campos */
 .field{ display:flex; flex-direction:column; gap:6px; }
-.field label{ font:600 11px var(--font); letter-spacing:.4px; text-transform:uppercase; color:var(--muted); }
+.field label{ font:700 10px var(--mono); letter-spacing:.8px; text-transform:uppercase; color:var(--muted); }
 .field input, .field select, .field textarea{
   background:var(--bg2); color:var(--txt); border:1px solid var(--border2);
   border-radius:8px; padding:10px 12px; font:500 14px var(--font);
-  outline:none; transition:border-color .18s;
+  outline:none; transition:border-color .18s, box-shadow .18s;
 }
-.field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--accent); }
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent),
+             0 0 12px color-mix(in srgb, var(--accent) 35%, transparent);
+}
 .field textarea{ resize:vertical; min-height:70px; }
 .hint{ font-size:11px; color:var(--muted); margin-top:4px; }
 .hint b{ color:var(--txt); }
@@ -83,4 +101,5 @@ body[data-alert="emergencia"] { --alert:var(--red);   }
 .card{
   background:var(--panel); border:1px solid var(--border);
   border-radius:var(--radius); padding:18px;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.25);
 }

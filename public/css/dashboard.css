@@ -39,6 +39,9 @@ header{
   flex:none; padding:0 15px; height:100%; display:flex; align-items:center; gap:8px;
   font:800 11px var(--mono); letter-spacing:2px; text-transform:uppercase;
   color:#04121c; background:var(--alert);
+  box-shadow:0 0 16px color-mix(in srgb, var(--alert) 55%, transparent),
+             0 0 34px color-mix(in srgb, var(--alert) 28%, transparent);
+  text-shadow:0 0 6px rgba(0,0,0,.3);
 }
 .ticker .tk-label .pulse{ width:7px; height:7px; border-radius:50%; background:#04121c; animation:blink 1.2s infinite; }
 .ticker .tk-viewport{ flex:1; overflow:hidden; position:relative; height:100%; }
@@ -65,6 +68,8 @@ main{ flex:1; position:relative; min-height:0; }
   position:absolute; top:12px; left:12px; z-index:5; pointer-events:none;
   font:800 10px var(--mono); letter-spacing:1.5px; text-transform:uppercase; color:#04121c;
   background:var(--alert); padding:5px 9px; border-radius:5px;
+  box-shadow:0 0 12px color-mix(in srgb, var(--alert) 55%, transparent),
+             0 0 26px color-mix(in srgb, var(--alert) 25%, transparent);
 }
 
 /* ── OSINT FEED (horizontal, sobreposto ao mapa) ────────── */
@@ -78,7 +83,8 @@ main{ flex:1; position:relative; min-height:0; }
 }
 .osint .osint-head h2{
   font:800 12px var(--mono); letter-spacing:2px; text-transform:uppercase;
-  color:var(--accent); text-shadow:0 0 12px color-mix(in srgb, var(--accent) 40%, transparent);
+  color:var(--cyan); text-shadow:0 0 14px color-mix(in srgb, var(--cyan) 70%, transparent),
+    0 0 30px color-mix(in srgb, var(--cyan) 35%, transparent);
 }
 .osint .osint-head .live{ font:700 10px var(--mono); letter-spacing:1px; color:var(--alert);
   display:flex; align-items:center; gap:6px; }
@@ -99,12 +105,21 @@ main{ flex:1; position:relative; min-height:0; }
 
 /* card de boletim (horizontal) */
 .bcard{
-  width:300px; flex:none; background:rgba(17,24,39,.88); border:1px solid var(--border2);
+  width:300px; flex:none; background:rgba(14,21,32,.9); border:1px solid var(--border2);
   border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:6px;
-  backdrop-filter:blur(6px); box-shadow:0 8px 24px rgba(0,0,0,.4);
+  backdrop-filter:blur(6px);
+  box-shadow:0 0 0 1px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.45),
+    inset 0 0 18px rgba(59,164,255,.06);
   white-space:normal;
+  transition:border-color .2s, box-shadow .2s;
 }
-.bcard .bt-time{ font:700 15px var(--display); color:var(--cyan); letter-spacing:1px;
+.bcard:hover{
+  border-color:var(--cyan);
+  box-shadow:0 0 14px color-mix(in srgb, var(--cyan) 45%, transparent),
+    0 0 30px color-mix(in srgb, var(--cyan) 18%, transparent), inset 0 0 18px rgba(0,229,255,.06);
+}
+.bcard .bt-time{ font:700 16px var(--display); color:var(--cyan); letter-spacing:1px;
+  text-shadow:0 0 10px color-mix(in srgb, var(--cyan) 60%, transparent);
   display:flex; justify-content:space-between; }
 .bcard .bt-time .ago{ font:600 10px var(--mono); color:var(--muted); }
 .bcard h3{ font:700 14px var(--font); color:var(--txt); line-height:1.25; }
@@ -121,8 +136,9 @@ main{ flex:1; position:relative; min-height:0; }
 /* status bar */
 .statusbar{
   position:absolute; bottom:0; right:0; z-index:14; pointer-events:none;
-  font:600 10px var(--mono); letter-spacing:1px; color:var(--muted);
-  padding:8px 14px; background:linear-gradient(90deg, transparent, rgba(8,10,13,.8));
+  font:700 10px var(--mono); letter-spacing:1px; color:var(--cyan);
+  text-shadow:0 0 10px color-mix(in srgb, var(--cyan) 60%, transparent);
+  padding:8px 14px; background:linear-gradient(90deg, transparent, rgba(5,7,11,.85));
 }
 
 /* scrollbar horizontal do feed */
