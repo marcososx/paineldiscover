@@ -75,7 +75,7 @@ main{ flex:1; position:relative; min-height:0; }
 /* ── OSINT FEED (horizontal, sobreposto ao mapa) ────────── */
 .osint{
   position:absolute; top:14px; right:14px; z-index:15;
-  width:470px; max-width:calc(100% - 28px);
+  width:423px; max-width:calc(100% - 28px);
   background:rgba(10,14,21,.78); border:1px solid var(--border2);
   border-radius:12px; backdrop-filter:blur(8px);
   box-shadow:0 0 0 1px rgba(0,0,0,.45), 0 14px 34px rgba(0,0,0,.5),
@@ -105,19 +105,19 @@ main{ flex:1; position:relative; min-height:0; }
   box-shadow:0 0 10px color-mix(in srgb, var(--cyan) 40%, transparent); }
 
 .osint .osint-viewport{
-  overflow:hidden; position:relative; height:170px;
+  overflow:hidden; position:relative;
   mask-image:linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent);
   -webkit-mask-image:linear-gradient(90deg, transparent, #000 20px, #000 calc(100% - 20px), transparent);
 }
 .osint .osint-track{
-  position:absolute; top:0; left:0; display:flex; gap:12px; padding:6px 20px;
+  position:relative; display:flex; gap:12px; padding:6px 20px;
   white-space:nowrap; will-change:transform; animation:tk 55s linear infinite;
 }
 .osint:hover .osint-track{ animation-play-state:paused; }
 
 /* ── modo recolhido: vira um strip fino igual ao do header ── */
 .osint .osint-mini{ display:none; }
-.osint.collapsed{ width:470px; }
+.osint.collapsed{ width:423px; }
 .osint.collapsed .osint-viewport{ display:none; }
 .osint.collapsed .osint-head{ padding:5px 12px; }
 .osint.collapsed .osint-head .live, .osint.collapsed .osint-head .count{ display:none; }
@@ -181,8 +181,7 @@ main{ flex:1; position:relative; min-height:0; }
 
 /* responsivo */
 @media (max-width:720px){
-  .osint{ top:10px; right:10px; width:310px; }
-  .osint.collapsed{ width:310px; }
-  .osint .osint-viewport{ height:150px; }
+  .osint{ top:10px; right:10px; width:279px; }
+  .osint.collapsed{ width:279px; }
   .bcard{ width:250px; }
 }
