@@ -14,7 +14,16 @@
   const COBERTURA_LABEL = {
     plantao: 'Estamos de plantão QG Discover',
     painel: 'Estamos ao vivo no painel de crise',
-    live: 'Estamos em live (Instagram Discover)'
+    live: 'Estamos em live (Instagram Discover)',
+    youtube: 'Estamos em live (YouTube)'
+  };
+  const SOCIAL = {
+    live: 'https://www.instagram.com/brusquediscover/',
+    youtube: 'https://www.youtube.com/@BrusqueDiscover'
+  };
+  const ICONS = {
+    live: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M23 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.8-1.8C19.3 5 12 5 12 5s-7.3 0-8.8.5A2.5 2.5 0 0 0 1.4 7.3C1 8.8 1 12 1 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.8 1.8C4.7 19 12 19 12 19s7.3 0 8.8-.5a2.5 2.5 0 0 0 1.8-1.8C23 15.2 23 12 23 12z"/><path d="M9.8 15.2V8.8l5.7 3.2z" fill="#04121c"/></svg>'
   };
 
   const $ = id => document.getElementById(id);
@@ -40,7 +49,19 @@
   function renderConfig(cfg){
     document.body.setAttribute('data-alert', cfg.nivelAlerta || 'normalidade');
     $('alerta-txt').textContent = ALERT_LABEL[cfg.nivelAlerta] || cfg.nivelAlerta;
-    $('cobertura-txt').textContent = COBERTURA_LABEL[cfg.statusCobertura] || cfg.statusCobertura;
+    const cob = cfg.statusCobertura;
+    $('cobertura-txt').textContent = COBERTURA_LABEL[cob] || cob;
+    const link = $('cobertura-link');
+    if (SOCIAL[cob]){
+      link.style.display = 'inline-flex';
+      link.href = SOCIAL[cob];
+      link.innerHTML = ICONS[cob];
+      link.title = cob === 'youtube' ? 'Abrir YouTube' : 'Abrir Instagram';
+    } else {
+      link.style.display = 'none';
+      link.removeAttribute('href');
+      link.innerHTML = '';
+    }
   }
 
   /* ── Ticker: últimas 10 notícias (título apenas) ───────── */

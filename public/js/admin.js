@@ -124,7 +124,7 @@
     const c = { nivelAlerta: $('c-alerta').value, statusCobertura: $('c-cobertura').value };
     const labels = { normalidade:'Normalidade', atencao:'Atenção', emergencia:'Emergência' };
     const cob = { plantao:'Estamos de plantão QG Discover', painel:'Estamos ao vivo no painel de crise',
-                  live:'Estamos em live (Instagram Discover)' };
+                  live:'Estamos em live (Instagram Discover)', youtube:'Estamos em live (YouTube)' };
     $('pv-badge-txt').textContent = labels[c.nivelAlerta];
     $('pv-badge').style.setProperty('--alert', c.nivelAlerta === 'emergencia' ? 'var(--red)'
       : c.nivelAlerta === 'atencao' ? 'var(--amber)' : 'var(--green)');
