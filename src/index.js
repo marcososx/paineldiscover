@@ -99,17 +99,17 @@ async function shortenTitles(titles, env) {
     } catch (_) {}
   }
 
-  // Valida: se algum item da IA saiu estranho, troca pelo truncamento
-  // determinístico — assim o site nunca fica feio.
-  const items = titles.map((t, i) => {
-    const c = aiItems ? (aiItems[i]?.curto || t) : t;
-    const words = (c.match(/[A-Za-zÀ-ÿ]{3,}/g) || []).length;
-    const bad = c.length > 70
-      || words < 2
-      || /\([a-zÀ-ÿ]\(|\d{2,}\)|too long|let'?s go|alternativ|perfeito|char /i.test(c);
-    const final = bad ? truncateSmart(t) : c.trim();
-    return { original: t, curto: final };
-  });
+  // Gemini travou (cota/erro) → redundância: manda os 10 títulos originais.
+  // Se respondeu, valida cada item e troca só o que saiu estranho pelo
+  // truncamento determinístico.
+  const items = aiItems
+    ? titles.map((t, i) => {
+        const c = aiItems[i]?.curto || t;
+        const words = (c.match(/[A-Za-zÀ-ÿ]{3,}/g) || []).length;
+        const bad = c.length > 70 || words < 2 || /\([a-zÀ-ÿ]\(|\d{2,}\)|too long|let'?s go|alternativ|perfeito|char /i.test(c);
+        return { original: t, curto: bad ? truncateSmart(t) : c.trim() };
+      })
+    : titles.map(t => ({ original: t, curto: t }));
 
   const resp = json({ items, ai: !!aiItems });
   const clo = resp.clone();
