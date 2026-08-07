@@ -4,7 +4,7 @@
   Store.init();
 
   const NEWS_URL = '/api/news';
-  const NEWS_INTERVAL = 30000; // monitora a cada 30 segundos
+  const NEWS_INTERVAL = 10000; // monitora a cada 10 segundos
 
   // Fallback: se o Worker não conseguir alcançar o Supabase (timeout 522),
   // o browser consulta o Supabase direto (CORS liberado).
@@ -39,6 +39,7 @@
   const osintTrack = $('osint-track');    // boletins (feed expandido)
   const miniTrack = $('osint-mini-track');// boletins (feed recolhido)
   const osintBox = $('osint');
+  let lastNewsSig = '';
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   /* ── Motor de marquee (requestAnimationFrame) ─────────────
@@ -168,7 +169,12 @@
       } catch (_) {}
     }
     if (items && items.length){
-      apply({ items: await shortenTitles(items) });
+      // só re-renderiza se as notícias mudaram (evita tremida e poupa a IA)
+      const sig = items.map(n => n.titulo).join('|');
+      if (sig !== lastNewsSig){
+        lastNewsSig = sig;
+        apply({ items: await shortenTitles(items) });
+      }
     } else if (!$('ticker-track').dataset.loaded){
       renderTicker(null);
     }
