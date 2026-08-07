@@ -4,7 +4,7 @@
   Store.init();
 
   const NEWS_URL = '/api/news';
-  const NEWS_INTERVAL = 60000; // monitora a cada 1 minuto
+  const NEWS_INTERVAL = 30000; // monitora a cada 30 segundos
 
   // Fallback: se o Worker não conseguir alcançar o Supabase (timeout 522),
   // o browser consulta o Supabase direto (CORS liberado).
@@ -41,22 +41,32 @@
   const osintBox = $('osint');
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  // Re-inicia as animações CSS (força repaint) — Safari às vezes congela
-  // o marquee até a primeira interação por causa do iframe do mapa.
-  function kickAnimations(){
-    [track, osintTrack, miniTrack].forEach(el => {
-      if (!el) return;
-      el.style.animation = 'none';
-      void el.offsetWidth;
-      el.style.animation = '';
-    });
+  /* ── Motor de marquee (requestAnimationFrame) ─────────────
+     Roda contínuo e NUNCA reinicia do zero — o "trimilique"
+     acontecia porque a animação CSS era reiniciada. Aqui o
+     deslocamento é calculado pelo tempo decorrido. */
+  function marquee(el, pxPerSec){
+    if (!el || el.dataset.marquee) return;
+    el.dataset.marquee = '1';
+    let pos = 0, last = null, paused = false, raf;
+    const step = ts => {
+      raf = requestAnimationFrame(step);
+      if (paused) { last = ts; return; }
+      if (last == null) last = ts;
+      const dt = Math.min((ts - last) / 1000, 0.25);
+      last = ts;
+      const half = el.scrollWidth / 2;
+      if (half > 0) {
+        pos = (pos + pxPerSec * dt) % half;
+        el.style.transform = 'translate3d(' + (-pos) + 'px,0,0)';
+      }
+    };
+    raf = requestAnimationFrame(step);
+    el.addEventListener('mouseenter', () => { paused = true; });
+    el.addEventListener('mouseleave', () => { paused = false; last = null; });
+    el.addEventListener('transitionend', () => {});
+    document.addEventListener('visibilitychange', () => { last = null; });
   }
-  window.addEventListener('focus', kickAnimations);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) kickAnimations(); });
-  // o iframe do mapa carrega pesado e pode congelar o compositor do Safari
-  setTimeout(kickAnimations, 600);
-  setTimeout(kickAnimations, 2500);
-  window.addEventListener('load', kickAnimations);
 
   const timeHm = ts => {
     const d = new Date(ts);
@@ -89,17 +99,42 @@
     }
   }
 
-  /* ── Ticker: últimas 10 notícias (título apenas) ───────── */
+  /* ── Ticker: últimas 10 notícias (título reduzido p/ IA) ─ */
   function renderTicker(items){
     if (!items || !items.length){
       track.innerHTML = '<span class="tk-item">Aguardando notícias do Brusque Discover…</span>';
       return;
     }
-    const item = n => '<span class="tk-item">'
-      + esc(n.titulo)
+    const item = n => '<span class="tk-item"'
+      + (n.titulo && n.curto && n.curto !== n.titulo ? ' title="' + esc(n.titulo) + '"' : '')
+      + '>'
+      + esc(n.curto || n.titulo)
       + (n.url ? '<a href="' + esc(n.url) + '" target="_blank" rel="noopener" title="Abrir matéria">&#128279;</a>' : '')
       + '</span>';
     track.innerHTML = items.map(item).join('') + items.map(item).join('');
+  }
+
+  async function shortenTitles(items){
+    const titles = (items || []).map(n => n.titulo);
+    if (!titles.length) return items;
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 15000);
+      const res = await fetch('/api/titles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titles }),
+        signal: ctl.signal,
+      });
+      clearTimeout(t);
+      if (!res.ok) throw new Error(res.status);
+      const d = await res.json();
+      const byTitle = {};
+      (d.items || []).forEach(x => { if (x && x.curto) byTitle[x.original] = x.curto; });
+      return items.map(n => ({ ...n, curto: byTitle[n.titulo] || n.titulo }));
+    } catch (_) {
+      return items.map(n => ({ ...n, curto: n.titulo }));
+    }
   }
 
   async function loadNews(){
@@ -107,33 +142,35 @@
       renderTicker(d.items || []);
       $('ticker-track').dataset.loaded = '1';
       $('statusbar').textContent = 'brusquediscover.com.br · atualizado ' + timeHm(Date.now()) + ' · minuto a minuto';
-      kickAnimations();
     };
     const fetchWithTimeout = (u, opts, ms) => {
       const ctl = new AbortController();
       const t = setTimeout(() => ctl.abort(), ms);
       return fetch(u, Object.assign({ signal: ctl.signal }, opts)).finally(() => clearTimeout(t));
     };
+    let items = null;
     // tenta direto do browser (mais confiável) e depois o Worker como fallback
     try {
       const res = await fetchWithTimeout(SUPABASE_DIRECT, { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }, 8000);
       if (res.ok){
         const rows = await res.json();
-        apply({ items: (rows || []).map(r => ({
+        items = (rows || []).map(r => ({
           titulo: r.title,
           url: 'https://brusquediscover.com.br/noticia/' + r.slug,
           publicado_em: r.published_at
-        })) });
-        return;
+        }));
       }
     } catch (_) {}
-    try {
-      const res = await fetchWithTimeout(NEWS_URL, { cache: 'no-store' }, 8000);
-      if (!res.ok) throw new Error(res.status);
-      apply(await res.json());
-    } catch (e) {
-      // mantém o último ticker; mostra o fallback se nunca carregou
-      if (!$('ticker-track').dataset.loaded) renderTicker(null);
+    if (!items){
+      try {
+        const res = await fetchWithTimeout(NEWS_URL, { cache: 'no-store' }, 8000);
+        if (res.ok) items = (await res.json()).items || [];
+      } catch (_) {}
+    }
+    if (items && items.length){
+      apply({ items: await shortenTitles(items) });
+    } else if (!$('ticker-track').dataset.loaded){
+      renderTicker(null);
     }
   }
 
@@ -175,7 +212,9 @@
   renderConfig(Store.getConfig());
   refreshOsint();
   loadNews();
-  kickAnimations();
+  marquee(track, 42);
+  marquee(osintTrack, 60);
+  marquee(miniTrack, 55);
 
   window.addEventListener('storage', () => { renderConfig(Store.getConfig()); refreshOsint(); });
   setInterval(() => { renderConfig(Store.getConfig()); refreshOsint(); }, 4000);

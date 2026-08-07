@@ -54,10 +54,7 @@ header{
 .ticker .tk-track{
   position:absolute; top:0; left:0; height:100%; display:flex; align-items:center; gap:0;
   white-space:nowrap; will-change:transform;
-  animation:tk 56s linear infinite;
 }
-.ticker:hover .tk-track{ animation-play-state:paused; }
-@keyframes tk{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 .tk-item{
   display:inline-flex; align-items:center; gap:9px; padding:0 20px;
   font:600 13px var(--font); color:var(--txt); border-right:1px solid var(--border);
@@ -128,9 +125,8 @@ main{ flex:1; position:relative; min-height:0; }
 }
 .osint .osint-track{
   position:relative; display:flex; gap:12px; padding:6px 20px;
-  white-space:nowrap; will-change:transform; animation:tk 22s linear infinite;
+  white-space:nowrap; will-change:transform;
 }
-.osint:hover .osint-track{ animation-play-state:paused; }
 
 /* ── modo recolhido: vira um strip fino igual ao do header ── */
 .osint .osint-mini{ display:none; }
@@ -144,9 +140,8 @@ main{ flex:1; position:relative; min-height:0; }
 }
 .osint.collapsed .osint-mini .mini-track{
   position:absolute; top:0; left:0; height:100%; display:flex; align-items:center; gap:0;
-  white-space:nowrap; animation:tk 24s linear infinite;
+  white-space:nowrap; will-change:transform;
 }
-.osint.collapsed .osint-mini:hover .mini-track{ animation-play-state:paused; }
 .mini-item{
   display:inline-flex; align-items:center; gap:9px; padding:0 18px; white-space:nowrap;
   font:600 12px var(--font); color:var(--txt);
