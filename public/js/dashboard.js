@@ -40,6 +40,8 @@
   const miniTrack = $('osint-mini-track');// boletins (feed recolhido)
   const osintBox = $('osint');
   let lastNewsSig = '';
+  // cache original → curto: títulos já reduzidos não são re-enviados à IA
+  const titleCache = {};
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   /* ── Motor de marquee (requestAnimationFrame) ─────────────
@@ -116,26 +118,27 @@
   }
 
   async function shortenTitles(items){
-    const titles = (items || []).map(n => n.titulo);
-    if (!titles.length) return items;
-    try {
-      const ctl = new AbortController();
-      const t = setTimeout(() => ctl.abort(), 15000);
-      const res = await fetch('/api/titles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titles }),
-        signal: ctl.signal,
-      });
-      clearTimeout(t);
-      if (!res.ok) throw new Error(res.status);
-      const d = await res.json();
-      const byTitle = {};
-      (d.items || []).forEach(x => { if (x && x.curto) byTitle[x.original] = x.curto; });
-      return items.map(n => ({ ...n, curto: byTitle[n.titulo] || n.titulo }));
-    } catch (_) {
-      return items.map(n => ({ ...n, curto: n.titulo }));
+    // só envia pra IA os títulos que ainda não foram reduzidos nesta sessão
+    const novos = (items || []).filter(n => !titleCache[n.titulo]);
+    if (novos.length){
+      try {
+        const ctl = new AbortController();
+        const t = setTimeout(() => ctl.abort(), 15000);
+        const res = await fetch('/api/titles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ titles: novos.map(n => n.titulo) }),
+          signal: ctl.signal,
+        });
+        clearTimeout(t);
+        if (res.ok){
+          const d = await res.json();
+          (d.items || []).forEach(x => { if (x && x.curto) titleCache[x.original] = x.curto; });
+        }
+      } catch (_) {}
     }
+    // títulos já reduzidos mantêm o curto em cache; o resto usa o original
+    return (items || []).map(n => ({ ...n, curto: titleCache[n.titulo] || n.titulo }));
   }
 
   async function loadNews(){
