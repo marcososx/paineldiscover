@@ -69,4 +69,27 @@ export default {
     if (url.pathname === '/api/news') return serveNews(url, ctx);
     return env.ASSETS.fetch(request);
   },
+  // Pré-aquece o cache do /api/news a cada minuto, pra nunca depender do
+  // egress Cloudflare→Supabase na hora da chamada.
+  async scheduled(_event, env, ctx) {
+    const cache = caches.default;
+    const cacheKey = new Request('https://paineldiscover.marcososx.workers.dev/api/news');
+    try {
+      const res = await fetchSupabase();
+      const rows = await res.json();
+      const items = (rows || []).map(r => ({
+        titulo: r.title,
+        url: `https://brusquediscover.com.br/noticia/${r.slug}`,
+        publicado_em: r.published_at,
+      }));
+      const body = JSON.stringify({ updated: new Date().toISOString(), items });
+      const resp = new Response(body, {
+        headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8',
+                   'Cache-Control': `public, max-age=${TTL}` },
+      });
+      await cache.put(cacheKey, resp.clone());
+    } catch (e) {
+      console.error('scheduled: falha ao atualizar notícias', e.message || e);
+    }
+  },
 };

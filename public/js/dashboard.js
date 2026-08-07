@@ -41,6 +41,23 @@
   const osintBox = $('osint');
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+  // Re-inicia as animações CSS (força repaint) — Safari às vezes congela
+  // o marquee até a primeira interação por causa do iframe do mapa.
+  function kickAnimations(){
+    [track, osintTrack, miniTrack].forEach(el => {
+      if (!el) return;
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = '';
+    });
+  }
+  window.addEventListener('focus', kickAnimations);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) kickAnimations(); });
+  // o iframe do mapa carrega pesado e pode congelar o compositor do Safari
+  setTimeout(kickAnimations, 600);
+  setTimeout(kickAnimations, 2500);
+  window.addEventListener('load', kickAnimations);
+
   const timeHm = ts => {
     const d = new Date(ts);
     return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
@@ -90,6 +107,7 @@
       renderTicker(d.items || []);
       $('ticker-track').dataset.loaded = '1';
       $('statusbar').textContent = 'brusquediscover.com.br · atualizado ' + timeHm(Date.now()) + ' · minuto a minuto';
+      kickAnimations();
     };
     const fetchWithTimeout = (u, opts, ms) => {
       const ctl = new AbortController();
@@ -157,6 +175,7 @@
   renderConfig(Store.getConfig());
   refreshOsint();
   loadNews();
+  kickAnimations();
 
   window.addEventListener('storage', () => { renderConfig(Store.getConfig()); refreshOsint(); });
   setInterval(() => { renderConfig(Store.getConfig()); refreshOsint(); }, 4000);
