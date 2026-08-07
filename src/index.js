@@ -18,8 +18,9 @@ const CORS = {
 
 const H = { apikey: ANON, Authorization: `Bearer ${ANON}` };
 
-// ── Redução de títulos com Gemini (Workers AI binding caiu no catálogo;
-//    usamos a API pública do Gemini com as chaves do Marcos) ────────────
+// ── Redução de títulos com IA (Groq primário + Gemini reserva) ──────────
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 const TITLES_TTL = 600; // segundos de cache das reduções
 
@@ -49,6 +50,22 @@ function extractArray(text, n) {
     }
   }
   return out.slice(0, n);
+}
+
+async function callGroq(prompt, apiKey) {
+  const res = await fetch(GROQ_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: 800,
+    }),
+  });
+  if (!res.ok) throw new Error('groq ' + res.status);
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content || '';
 }
 
 async function callGemini(prompt, apiKey) {
@@ -82,24 +99,34 @@ async function shortenTitles(titles, env) {
   if (hit) return hit;
 
   const prompt = 'Abaixo está uma lista de títulos de notícias em português. '
-    + 'Para CADA título, escreva uma versão reduzida com ATÉ 55 caracteres, '
-    + 'mantendo o essencial. Saída: apenas os títulos reduzidos, um por linha, '
+    + 'Para CADA título, escreva uma versão reduzida com ENTRE 40 e 55 caracteres, '
+    + 'mantendo o essencial e o máximo de informação. '
+    + 'Saída: apenas os títulos reduzidos, um por linha, '
     + 'na MESMA ordem da entrada, sem numeração, sem aspas, sem comentários.\n\n'
     + titles.map((t, i) => `${i + 1}. ${t}`).join('\n');
 
+  // Tenta Groq (estável) primeiro; Gemini como reserva. Qualquer erro
+  // cai no fallback determinístico.
   let aiItems = null;
-  for (const key of [env.GEMINI_API_KEY, env.GEMINI_API_KEY_ALT].filter(Boolean)) {
+  let providerUsed = null;
+  const providers = [
+    { name: 'groq', call: () => callGroq(prompt, env.GROQ_API_KEY) },
+    { name: 'gemini', call: () => callGemini(prompt, env.GEMINI_API_KEY) },
+    { name: 'gemini2', call: () => callGemini(prompt, env.GEMINI_API_KEY_ALT) },
+  ];
+  for (const p of providers) {
     try {
-      const text = await callGemini(prompt, key);
+      const text = await p.call();
       const arr = extractArray(text, titles.length);
       if (arr.length) {
         aiItems = titles.map((t, i) => ({ original: t, curto: arr[i] || t }));
+        providerUsed = p.name;
         break;
       }
     } catch (_) {}
   }
 
-  // Gemini travou (cota/erro) → redundância: manda os 10 títulos originais.
+  // IA travou (cota/erro) → redundância: manda os 10 títulos originais.
   // Se respondeu, valida cada item e troca só o que saiu estranho pelo
   // truncamento determinístico.
   const items = aiItems
@@ -111,7 +138,7 @@ async function shortenTitles(titles, env) {
       })
     : titles.map(t => ({ original: t, curto: t }));
 
-  const resp = json({ items, ai: !!aiItems });
+  const resp = json({ items, ai: !!aiItems, provider: providerUsed });
   const clo = resp.clone();
   clo.headers.set('Cache-Control', `public, max-age=${aiItems ? TITLES_TTL : 180}`);
   await cache.put(cacheKey, clo);

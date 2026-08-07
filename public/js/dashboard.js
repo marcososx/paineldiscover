@@ -56,15 +56,15 @@
       const dt = Math.min((ts - last) / 1000, 0.25);
       last = ts;
       const half = el.scrollWidth / 2;
-      if (half > 0) {
-        pos = (pos + pxPerSec * dt) % half;
-        el.style.transform = 'translate3d(' + (-pos) + 'px,0,0)';
-      }
+      // conteúdo ainda vazio ou sem largura: não move nada até popular
+      if (!(half > 0) || !isFinite(half)) { pos = 0; return; }
+      pos = (pos + pxPerSec * dt) % half;
+      if (!isFinite(pos)) pos = 0;
+      el.style.transform = 'translate3d(' + (-pos) + 'px,0,0)';
     };
     raf = requestAnimationFrame(step);
     el.addEventListener('mouseenter', () => { paused = true; });
     el.addEventListener('mouseleave', () => { paused = false; last = null; });
-    el.addEventListener('transitionend', () => {});
     document.addEventListener('visibilitychange', () => { last = null; });
   }
 
