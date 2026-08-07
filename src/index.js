@@ -23,6 +23,7 @@ const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 const TITLES_TTL = 600; // segundos de cache das reduções
+const TITLES_CACHE_VERSION = 'v2'; // bump invalida o cache antigo das reduções
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body),
@@ -94,7 +95,7 @@ function truncateSmart(s, max = 60) {
 
 async function shortenTitles(titles, env) {
   const cache = caches.default;
-  const cacheKey = new Request('https://paineldiscover.marcososx.workers.dev/api/titles/' + hashStr(JSON.stringify(titles)));
+  const cacheKey = new Request('https://paineldiscover.marcososx.workers.dev/api/titles/' + TITLES_CACHE_VERSION + '/' + hashStr(JSON.stringify(titles)));
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
 
