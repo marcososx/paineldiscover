@@ -117,6 +117,16 @@
     track.innerHTML = items.map(item).join('') + items.map(item).join('');
   }
 
+  // corta em limite de palavra no cliente (rede de segurança do título grande)
+  function truncClient(s, max = 60){
+    s = String(s || '').trim();
+    if (s.length <= max) return s;
+    let cut = s.slice(0, max);
+    const sp = cut.lastIndexOf(' ');
+    if (sp > max * 0.5) cut = cut.slice(0, sp);
+    return cut.replace(/[\s,;:–-]+$/, '') + '…';
+  }
+
   async function shortenTitles(items){
     // só envia pra IA os títulos que ainda não foram reduzidos nesta sessão
     const novos = (items || []).filter(n => !titleCache[n.titulo]);
@@ -133,12 +143,21 @@
         clearTimeout(t);
         if (res.ok){
           const d = await res.json();
-          (d.items || []).forEach(x => { if (x && x.curto) titleCache[x.original] = x.curto; });
+          // casa por ÍNDICE (a IA devolve na mesma ordem); nunca por string,
+          // pra não falhar por diferença mínima de whitespace
+          novos.forEach((n, i) => {
+            const item = (d.items || [])[i];
+            if (item && item.curto) titleCache[n.titulo] = item.curto;
+          });
         }
       } catch (_) {}
     }
     // títulos já reduzidos mantêm o curto em cache; o resto usa o original
-    return (items || []).map(n => ({ ...n, curto: titleCache[n.titulo] || n.titulo }));
+    // com garantia de tamanho (nunca estoura 60 caracteres)
+    return (items || []).map(n => {
+      const curto = titleCache[n.titulo] || n.titulo;
+      return { ...n, curto: truncClient(curto, 60) };
+    });
   }
 
   async function loadNews(){
