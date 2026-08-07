@@ -6,6 +6,14 @@
   const NEWS_URL = '/api/news';
   const NEWS_INTERVAL = 60000; // monitora a cada 1 minuto
 
+  // Fallback: se o Worker não conseguir alcançar o Supabase (timeout 522),
+  // o browser consulta o Supabase direto (CORS liberado).
+  const SUPABASE_DIRECT = 'https://fnmyuwzbxgjfhzbcuvjq.supabase.co/rest/v1/posts'
+    + '?select=title,slug,published_at'
+    + '&status=eq.published&post_type=neq.video&published_at=not.is.null'
+    + '&order=published_at.desc&limit=10';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZubXl1d3pieGdqZmh6YmN1dmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NTc3NTMsImV4cCI6MjA4NjIzMzc1M30.xhWBLdW6paPQekqOoKHeNNEfV9dmd2mrwd3MBmAZ31g';
+
   const ALERT_LABEL = {
     normalidade: 'Normalidade',
     atencao: 'Atenção',
@@ -78,12 +86,33 @@
   }
 
   async function loadNews(){
-    try {
-      const res = await fetch(NEWS_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error(res.status);
-      const d = await res.json();
+    const apply = d => {
       renderTicker(d.items || []);
+      $('ticker-track').dataset.loaded = '1';
       $('statusbar').textContent = 'brusquediscover.com.br · atualizado ' + timeHm(Date.now()) + ' · minuto a minuto';
+    };
+    const fetchWithTimeout = (u, opts, ms) => {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), ms);
+      return fetch(u, Object.assign({ signal: ctl.signal }, opts)).finally(() => clearTimeout(t));
+    };
+    // tenta direto do browser (mais confiável) e depois o Worker como fallback
+    try {
+      const res = await fetchWithTimeout(SUPABASE_DIRECT, { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }, 8000);
+      if (res.ok){
+        const rows = await res.json();
+        apply({ items: (rows || []).map(r => ({
+          titulo: r.title,
+          url: 'https://brusquediscover.com.br/noticia/' + r.slug,
+          publicado_em: r.published_at
+        })) });
+        return;
+      }
+    } catch (_) {}
+    try {
+      const res = await fetchWithTimeout(NEWS_URL, { cache: 'no-store' }, 8000);
+      if (!res.ok) throw new Error(res.status);
+      apply(await res.json());
     } catch (e) {
       // mantém o último ticker; mostra o fallback se nunca carregou
       if (!$('ticker-track').dataset.loaded) renderTicker(null);
