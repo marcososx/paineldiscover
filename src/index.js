@@ -23,7 +23,7 @@ const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 const TITLES_TTL = 600; // segundos de cache das reduções
-const TITLES_CACHE_VERSION = 'v2'; // bump invalida o cache antigo das reduções
+const TITLES_CACHE_VERSION = 'v3'; // bump invalida o cache antigo das reduções
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body),
@@ -139,7 +139,9 @@ async function shortenTitles(titles, env) {
         const words = (c.match(/[A-Za-zÀ-ÿ]{3,}/g) || []).length;
         const bad = c.length > 70 || words < 2 || /\([a-zÀ-ÿ]\(|\d{2,}\)|too long|let'?s go|alternativ|perfeito|char /i.test(c);
         if (bad) c = truncateSmart(t);
-        // garante o teto de 60 caracteres no que veio da IA
+        // garante a faixa 40-60 no que veio da IA: muito curto → corta o
+        // original maior; muito longo → corta no teto.
+        if (c.length < 40) c = truncateSmart(t);
         if (c.length > 60) c = c.slice(0, 59).replace(/[\s,;:–-]+$/, '') + '…';
         return { original: t, curto: c.trim() };
       })
