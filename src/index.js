@@ -82,7 +82,7 @@ async function callGemini(prompt, apiKey) {
   return (data?.candidates?.[0]?.content?.parts || []).map(p => p.text).join('');
 }
 
-function truncateSmart(s, max = 55) {
+function truncateSmart(s, max = 60) {
   s = String(s || '').trim();
   if (s.length <= max) return s;
   // corta em limite de palavra sem quebrar no meio
@@ -99,9 +99,12 @@ async function shortenTitles(titles, env) {
   if (hit) return hit;
 
   const prompt = 'Abaixo está uma lista de títulos de notícias em português. '
-    + 'Para CADA título, escreva uma versão reduzida com ENTRE 40 e 55 caracteres, '
-    + 'mantendo o essencial e o máximo de informação. '
-    + 'Saída: apenas os títulos reduzidos, um por linha, '
+    + 'Reescreva cada título de forma que fique com ENTRE 40 e 60 caracteres '
+    + '(contando os espaços). IMPORTANTE: corte/triture o título original, NÃO '
+    + 'crie um resumo novo — mantenha o máximo de palavras do original, na ordem, '
+    + 'apenas removendo trechos para caber no tamanho. Se o título original for '
+    + 'menor que 40 caracteres, mantenha-o como está. '
+    + 'Saída: apenas os títulos reescritos, um por linha, '
     + 'na MESMA ordem da entrada, sem numeração, sem aspas, sem comentários.\n\n'
     + titles.map((t, i) => `${i + 1}. ${t}`).join('\n');
 
@@ -131,10 +134,13 @@ async function shortenTitles(titles, env) {
   // truncamento determinístico.
   const items = aiItems
     ? titles.map((t, i) => {
-        const c = aiItems[i]?.curto || t;
+        let c = aiItems[i]?.curto || t;
         const words = (c.match(/[A-Za-zÀ-ÿ]{3,}/g) || []).length;
         const bad = c.length > 70 || words < 2 || /\([a-zÀ-ÿ]\(|\d{2,}\)|too long|let'?s go|alternativ|perfeito|char /i.test(c);
-        return { original: t, curto: bad ? truncateSmart(t) : c.trim() };
+        if (bad) c = truncateSmart(t);
+        // garante o teto de 60 caracteres no que veio da IA
+        if (c.length > 60) c = c.slice(0, 59).replace(/[\s,;:–-]+$/, '') + '…';
+        return { original: t, curto: c.trim() };
       })
     : titles.map(t => ({ original: t, curto: t }));
 
