@@ -40,13 +40,19 @@
       <iframe id="mapa" src="https://brusque-maps.marcososx.workers.dev" title="Mapa de Crise Brusque" allow="geolocation"></iframe>
     </section>
 
-    <!-- ── TEMPO REAL (caixa canto superior direito, recolhível) ── -->
+    <!-- ── TEMPO REAL · feed OSINT (estilo pizzint.watch) — canto sup. direito, recolhível ── -->
     <section class="osint" id="osint">
       <div class="osint-head" id="osint-head" title="Recolher / expandir">
+        <span class="oh-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 15 9"/><path d="M12 6a6 6 0 0 1 6 6"/><path d="M12 2a10 10 0 0 1 10 10"/><rect x="3" y="15" width="6" height="6" rx="1.2"/></svg></span>
         <h2>Tempo real</h2>
         <span class="live">ao vivo</span>
-        <span class="count" id="osint-count"></span>
+        <span class="oh-z" id="osint-clock">--:--</span>
+        <span class="oh-auto">AUTO</span>
         <button class="osint-toggle" id="osint-toggle" title="Recolher / expandir">▾</button>
+      </div>
+      <div class="osint-sub">
+        <span class="oh-mon">Monitorando · QG Discover</span>
+        <span class="count" id="osint-count"></span>
       </div>
       <div class="osint-viewport"><div class="osint-track" id="osint-track"></div></div>
       <div class="osint-mini"><div class="mini-track" id="osint-mini-track"></div></div>
@@ -55,7 +61,7 @@
     <div class="statusbar" id="statusbar">brusquediscover.com.br · minuto a minuto</div>
   </main>
 
-<script src="/js/store.js?v=3"></script>
-<script src="/js/dashboard.js?v=3"></script>
+<script src="/js/store.js?v=4"></script>
+<script src="/js/dashboard.js?v=4"></script>
 </body>
 </html>
