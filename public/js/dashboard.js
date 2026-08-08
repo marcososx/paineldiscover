@@ -44,6 +44,13 @@
   const titleCache = {};
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+  // Identidade da fonte no card (por enquanto fixa no QG). Quando o painel de
+  // trás mandar a origem por boletim, troca aqui.
+  const HANDLE = '@brusquediscover';
+  const AVATAR = '/img/logo.png';
+  // ícone de link externo no rodapé do card ("VER ↗")
+  const EXT_ICON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>';
+
   /* ── Motor de marquee (requestAnimationFrame) ─────────────
      Roda contínuo e NUNCA reinicia do zero — o "trimilique"
      acontecia porque a animação CSS era reiniciada. Aqui o
@@ -206,16 +213,31 @@
   function renderOsint(posts){
     $('osint-count').textContent = posts.length ? posts.length + ' boletins' : '';
     if (!posts.length){
-      osintTrack.innerHTML = '<div class="bcard"><h3>Aguardando publicação</h3><p>O QG vai publicar aqui em breve.</p></div>';
+      osintTrack.innerHTML = '<article class="bcard">'
+        + '<div class="bc-head"><img class="bc-av" src="' + AVATAR + '" alt=""><span class="bc-handle">' + HANDLE + '</span></div>'
+        + '<div class="bc-body"><b>Aguardando boletins</b> O QG publica aqui, em tempo real.</div>'
+        + '<div class="bc-foot"><span class="bc-live">Standby</span></div>'
+        + '</article>';
       miniTrack.innerHTML = '<span class="mini-item">Sem boletins ainda</span>';
       return;
     }
+    // card no formato do feed OSINT do pizzint (horizontal):
+    // cabeçalho (avatar + @handle · tempo), corpo (título + resumo), rodapé (LIVE · VER)
     const card = p => '<article class="bcard">'
-      + '<div class="bt-time"><span>' + timeHm(p.ts) + '</span><span class="ago">' + ago(p.ts) + '</span></div>'
-      + '<h3>' + esc(p.titulo) + '</h3>'
-      + '<p>' + esc(p.resumo) + '</p>'
-      + (p.url ? '<a class="link" href="' + esc(p.url) + '" target="_blank" rel="noopener">'
-          + esc(p.labelLink || 'Ver mais') + ' &nearr;</a>' : '')
+      + '<div class="bc-head">'
+      +   '<img class="bc-av" src="' + AVATAR + '" alt="" loading="lazy">'
+      +   '<span class="bc-handle">' + HANDLE + '</span>'
+      +   '<span class="bc-time">' + ago(p.ts) + '</span>'
+      + '</div>'
+      + '<div class="bc-body">'
+      +   (p.titulo ? '<b>' + esc(p.titulo) + '</b> ' : '')
+      +   esc(p.resumo || '')
+      + '</div>'
+      + '<div class="bc-foot">'
+      +   '<span class="bc-live">Live</span>'
+      +   (p.url ? '<a class="bc-view" href="' + esc(p.url) + '" target="_blank" rel="noopener" title="'
+          + esc(p.labelLink || 'Abrir boletim') + '">' + esc(p.labelLink || 'Ver') + ' ' + EXT_ICON + '</a>' : '')
+      + '</div>'
       + '</article>';
     const mini = p => '<span class="mini-item">'
       + '<span class="mi-time">' + timeHm(p.ts) + '</span>' + esc(p.titulo) + '</span>';
