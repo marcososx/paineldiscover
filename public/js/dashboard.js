@@ -251,8 +251,48 @@
     $('osint-toggle').textContent = c ? '▴' : '▾';
   }
   const osintToggle = () => setOsintCollapsed(!osintBox.classList.contains('collapsed'));
-  $('osint-head').addEventListener('click', osintToggle);
   $('osint-toggle').addEventListener('click', e => { e.stopPropagation(); osintToggle(); });
+
+  /* ── Arrastar a caixa pela barra (mesmo padrão dos painéis do mapa) ──
+     Clique simples na barra = recolher/expandir; arrastar (>4px) = mover.
+     O botão ▾ segue funcionando (fica de fora do arrasto). */
+  (function makeOsintDraggable(){
+    const box = osintBox, head = $('osint-head');
+    if (!box || !head) return;
+    head.style.touchAction = 'none';
+    let sx, sy, ox, oy, moved = false, dragging = false;
+    head.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || e.target.closest('.osint-toggle')) return;
+      const r = box.getBoundingClientRect();
+      sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
+      moved = false; dragging = true;
+      try { head.setPointerCapture(e.pointerId); } catch(_){}
+    });
+    head.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (!moved && Math.hypot(dx, dy) < 4) return;
+      if (!moved){
+        moved = true;
+        box.classList.add('dragging');
+        box.style.position = 'fixed';
+        box.style.right = 'auto'; box.style.bottom = 'auto';
+        box.style.transform = 'none'; box.style.margin = '0';
+      }
+      const w = box.offsetWidth, h = box.offsetHeight;
+      box.style.left = Math.max(4, Math.min(ox + dx, innerWidth  - w - 4)) + 'px';
+      box.style.top  = Math.max(4, Math.min(oy + dy, innerHeight - h - 4)) + 'px';
+    });
+    const end = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      box.classList.remove('dragging');
+      try { head.releasePointerCapture(e.pointerId); } catch(_){}
+      if (!moved) osintToggle();   // clique simples na barra = recolher/expandir
+    };
+    head.addEventListener('pointerup', end);
+    head.addEventListener('pointercancel', end);
+  })();
 
   function refreshOsint(){
     renderOsint(Store.getPosts());
